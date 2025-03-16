@@ -2,6 +2,7 @@ package com.softdesign.avaliacao_tecnica.dto;
 
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.softdesign.avaliacao_tecnica.model.Botao;
 import com.softdesign.avaliacao_tecnica.model.SessaoVotacao;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -25,4 +26,8 @@ public class PautaDTO {
     private String titulo;
 
     private List<SessaoVotacao> sessoes;
+
+    private Botao botaoOk;
+
+    private Botao botaoCancelar;
 }

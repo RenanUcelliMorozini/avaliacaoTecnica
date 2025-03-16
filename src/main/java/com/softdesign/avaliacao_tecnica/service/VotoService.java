@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
+import com.softdesign.avaliacao_tecnica.exception.AssociadoRealizouVotoException;
 import com.softdesign.avaliacao_tecnica.exception.SessaoVotacaoInvalidaException;
 import com.softdesign.avaliacao_tecnica.model.SessaoVotacao;
 import com.softdesign.avaliacao_tecnica.model.Voto;
@@ -32,7 +33,7 @@ public class VotoService {
         }
 
         if (votoRepository.existsByAssociadoIdAndSessaoId(associadoId, sessaoId)) {
-            throw new SessaoVotacaoInvalidaException("O associado já votou nesta sessão.");
+            throw new AssociadoRealizouVotoException("O associado já votou nesta sessão.");
         }
 
         final Voto novoVoto = Voto.builder()

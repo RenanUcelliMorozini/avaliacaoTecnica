@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.softdesign.avaliacao_tecnica.dto.VotoDTO;
+import com.softdesign.avaliacao_tecnica.exception.AssociadoRealizouVotoException;
 import com.softdesign.avaliacao_tecnica.exception.SessaoVotacaoInvalidaException;
 import com.softdesign.avaliacao_tecnica.model.Voto;
 import com.softdesign.avaliacao_tecnica.service.VotoService;
@@ -40,6 +41,8 @@ public class VotoController {
             return ResponseEntity.ok(novoVotoDTO);
         } catch (SessaoVotacaoInvalidaException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (AssociadoRealizouVotoException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro inesperado ao registrar o voto.");
         }
