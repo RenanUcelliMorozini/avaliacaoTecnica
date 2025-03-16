@@ -2,7 +2,8 @@ package com.softdesign.avaliacao_tecnica.controller;
 
 import java.time.LocalDate;
 import java.util.List;
-
+import java.util.stream.Collectors;
+import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.softdesign.avaliacao_tecnica.domain.DominioTipoCampo;
+import com.softdesign.avaliacao_tecnica.dto.SessaoVotacaoDTO;
 import com.softdesign.avaliacao_tecnica.exception.PautaNaoEncontradaException;
 import com.softdesign.avaliacao_tecnica.model.SessaoVotacao;
 import com.softdesign.avaliacao_tecnica.service.SessaoVotacaoService;
@@ -27,8 +29,13 @@ public class SessaoVotacaoController {
     }
 
     @GetMapping
-    public List<SessaoVotacao> listarVotacao() {
-        return sessaoVotacaoService.listarVotacao();
+    public List<SessaoVotacaoDTO> listarVotacao() {
+        List<SessaoVotacao> sessaoVotacaos = sessaoVotacaoService.listarVotacao();
+        List<SessaoVotacaoDTO> sessaoVotacaoDTOs = sessaoVotacaos.stream()
+                .map(this::converterParaDTO) 
+                .collect(Collectors.toList());
+                
+        return sessaoVotacaoDTOs;
     }
 
     @PostMapping("/abrir")
@@ -41,12 +48,18 @@ public class SessaoVotacaoController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate valorData
             ) {
         try {
-            SessaoVotacao sessao = sessaoVotacaoService.abrirSessao(pautaId, tipo, duracaoMinutos, valorTexto, valorNumerico, valorData);
-            return ResponseEntity.status(HttpStatus.CREATED).body(sessao); 
+            SessaoVotacaoDTO sessaoVotacaoDTO = converterParaDTO(sessaoVotacaoService.abrirSessao(pautaId, tipo, duracaoMinutos, valorTexto, valorNumerico, valorData));
+            return ResponseEntity.status(HttpStatus.CREATED).body(sessaoVotacaoDTO); 
         } catch (PautaNaoEncontradaException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());  
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro inesperado: ".concat(ex.getMessage())); 
         }
+    }
+
+    private SessaoVotacaoDTO converterParaDTO(SessaoVotacao sessaoVotacao) {
+        SessaoVotacaoDTO dto = new SessaoVotacaoDTO();
+        BeanUtils.copyProperties(sessaoVotacao, dto);
+        return dto;
     }
 }
